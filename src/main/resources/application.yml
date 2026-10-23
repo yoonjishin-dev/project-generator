@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: project-generator
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:project_generator}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  ai:
+    openai:
+      base-url: ${AI_BASE_URL:http://localhost:11434}
+      api-key: ${AI_API_KEY:ollama} # Ollama는 키를 검사하지 않음, 아무 값이나 가능
+      chat:
+        options:
+          model: ${AI_MODEL:qwen2.5-coder:7b}
+          temperature: 0.0
+          seed: 42
+
+server:
+  port: 8080
+
