@@ -1,0 +1,30 @@
+{
+  "name": "spring-boot",
+  "description": "Java 21 + Spring Boot 3.5 + JPA + MySQL REST API 프로젝트",
+  "files": [
+    { "source": "root/build.gradle.kts.mustache", "target": "build.gradle.kts", "scope": "project" },
+    { "source": "root/settings.gradle.kts.mustache", "target": "settings.gradle.kts", "scope": "project" },
+    { "source": "root/gitignore.mustache", "target": ".gitignore", "scope": "project" },
+    { "source": "root/README.md.mustache", "target": "README.md", "scope": "project" },
+    { "source": "root/AGENTS.md.mustache", "target": "AGENTS.md", "scope": "project" },
+    { "source": "root/application.yml.mustache", "target": "src/main/resources/application.yml", "scope": "project" },
+    { "source": "root/Application.java.mustache", "target": "src/main/java/{{basePackagePath}}/Application.java", "scope": "project" },
+    { "source": "common/NotFoundException.java.mustache", "target": "src/main/java/{{basePackagePath}}/common/NotFoundException.java", "scope": "project" },
+    { "source": "common/GlobalExceptionHandler.java.mustache", "target": "src/main/java/{{basePackagePath}}/common/GlobalExceptionHandler.java", "scope": "project" },
+    { "source": "docs/PRD.md.mustache", "target": "docs/PRD.md", "scope": "project" },
+    { "source": "docs/architecture.md.mustache", "target": "docs/architecture.md", "scope": "project" },
+    { "source": "docs/api-spec.md.mustache", "target": "docs/api-spec.md", "scope": "project" },
+    { "source": "domain/Entity.java.mustache", "target": "src/main/java/{{basePackagePath}}/{{packageName}}/{{name}}.java", "scope": "entity" },
+    { "source": "domain/Repository.java.mustache", "target": "src/main/java/{{basePackagePath}}/{{packageName}}/{{name}}Repository.java", "scope": "entity" },
+    { "source": "domain/Service.java.mustache", "target": "src/main/java/{{basePackagePath}}/{{packageName}}/{{name}}Service.java", "scope": "entity" },
+    { "source": "domain/Controller.java.mustache", "target": "src/main/java/{{basePackagePath}}/{{packageName}}/{{name}}Controller.java", "scope": "entity" },
+    { "source": "domain/Request.java.mustache", "target": "src/main/java/{{basePackagePath}}/{{packageName}}/{{name}}Request.java", "scope": "entity", "condition": "hasBody" },
+    { "source": "domain/Response.java.mustache", "target": "src/main/java/{{basePackagePath}}/{{packageName}}/{{name}}Response.java", "scope": "entity" }
+  ],
+  "static": [
+    { "source": "static/gradlew", "target": "gradlew", "executable": true },
+    { "source": "static/gradlew.bat", "target": "gradlew.bat" },
+    { "source": "static/gradle/wrapper/gradle-wrapper.jar", "target": "gradle/wrapper/gradle-wrapper.jar" },
+    { "source": "static/gradle/wrapper/gradle-wrapper.properties", "target": "gradle/wrapper/gradle-wrapper.properties" }
+  ]
+}

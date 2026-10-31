@@ -1,0 +1,58 @@
+package {{basePackage}}.{{packageName}};
+
+{{#hasBody}}
+import jakarta.validation.Valid;
+{{/hasBody}}
+{{#hasList}}
+import java.util.List;
+{{/hasList}}
+import lombok.RequiredArgsConstructor;
+{{#importsHttpStatus}}
+import org.springframework.http.HttpStatus;
+{{/importsHttpStatus}}
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("{{path}}")
+@RequiredArgsConstructor
+public class {{name}}Controller {
+
+    private final {{name}}Service {{varName}}Service;
+{{#hasList}}
+
+    @GetMapping
+    public List<{{name}}Response> list() {
+        return {{varName}}Service.findAll();
+    }
+{{/hasList}}
+{{#hasGet}}
+
+    @GetMapping("/{id}")
+    public {{name}}Response get(@PathVariable Long id) {
+        return {{varName}}Service.findById(id);
+    }
+{{/hasGet}}
+{{#hasCreate}}
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public {{name}}Response create(@Valid @RequestBody {{name}}Request request) {
+        return {{varName}}Service.create(request);
+    }
+{{/hasCreate}}
+{{#hasUpdate}}
+
+    @PutMapping("/{id}")
+    public {{name}}Response update(@PathVariable Long id, @Valid @RequestBody {{name}}Request request) {
+        return {{varName}}Service.update(id, request);
+    }
+{{/hasUpdate}}
+{{#hasDelete}}
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        {{varName}}Service.delete(id);
+    }
+{{/hasDelete}}
+}

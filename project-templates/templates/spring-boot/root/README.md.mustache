@@ -1,0 +1,30 @@
+{{#prd}}
+# {{title}}
+
+{{summary}}
+
+{{/prd}}
+> project-generator 템플릿 `spring-boot` {{templateVersion}}로 생성된 프로젝트입니다.
+
+## 문서
+
+- [기획서 (PRD)](docs/PRD.md)
+- [아키텍처](docs/architecture.md)
+- [API 명세](docs/api-spec.md)
+
+## 실행
+
+```bash
+# MySQL에 데이터베이스 생성
+mysql -u root -p -e "CREATE DATABASE {{databaseName}};"
+
+DB_PASSWORD=비밀번호 ./gradlew bootRun
+```
+
+| 환경변수 | 기본값 |
+|---|---|
+| `DB_HOST` | `localhost` |
+| `DB_PORT` | `3306` |
+| `DB_NAME` | `{{databaseName}}` |
+| `DB_USERNAME` | `root` |
+| `DB_PASSWORD` | (없음) |

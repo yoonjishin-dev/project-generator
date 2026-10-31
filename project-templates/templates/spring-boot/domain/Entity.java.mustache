@@ -1,0 +1,62 @@
+package {{basePackage}}.{{packageName}};
+
+{{#relations}}
+import {{basePackage}}.{{targetPackageName}}.{{target}};
+{{/relations}}
+import jakarta.persistence.*;
+{{#importsBigDecimal}}
+import java.math.BigDecimal;
+{{/importsBigDecimal}}
+{{#importsLocalDate}}
+import java.time.LocalDate;
+{{/importsLocalDate}}
+import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+@Entity
+@Table(name = "{{tableName}}")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class {{name}} {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+{{#fields}}
+
+    {{columnAnnotation}}
+    private {{javaType}} {{name}};
+{{/fields}}
+{{#relations}}
+
+    @ManyToOne(fetch = FetchType.LAZY{{#required}}, optional = false{{/required}})
+    @JoinColumn(name = "{{joinColumnName}}"{{#required}}, nullable = false{{/required}})
+    private {{target}} {{fieldName}};
+{{/relations}}
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    public {{name}}({{#params}}{{javaType}} {{name}}{{^last}}, {{/last}}{{/params}}) {
+{{#params}}
+        this.{{name}} = {{name}};
+{{/params}}
+    }
+{{#hasUpdate}}
+
+    public void update({{#params}}{{javaType}} {{name}}{{^last}}, {{/last}}{{/params}}) {
+{{#params}}
+        this.{{name}} = {{name}};
+{{/params}}
+    }
+{{/hasUpdate}}
+}

@@ -2,6 +2,12 @@ spring:
   application:
     name: project-generator
 
+  # 아직 DB를 쓰는 기능이 없어서 꺼 둔다. 생성 이력 저장 등이 필요해지면 이 autoconfigure 블록을 지우고 MySQL을 준비한다
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:project_generator}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${DB_USERNAME:root}
@@ -26,7 +32,39 @@ spring:
           model: ${AI_MODEL:qwen2.5-coder:7b}
           temperature: 0.0
           seed: 42
+    # 기본값(10번, 2초부터 5배씩)은 AI 서버가 꺼져 있을 때 10분 넘게 기다리게 된다
+    retry:
+      max-attempts: 3
+      backoff:
+        initial-interval: 1s
+        multiplier: 2
+        max-interval: 5s
+
+  mvc:
+    problemdetails:
+      enabled: true
 
 server:
   port: 8080
+
+generator:
+  # 템플릿 폴더. 생성기와 같은 저장소에 있어서 생성기 커밋이 같으면 같은 템플릿이 쓰인다
+  templates-dir: ${GENERATOR_TEMPLATES_DIR:project-templates}
+  # 템플릿을 별도 git 저장소로 분리했을 때만 설정 (URL 또는 로컬 경로).
+  # 설정하면 templates-dir 대신 그 저장소의 template-version 태그를 받아 쓴다. 브랜치는 받지 않는다
+  templates-repository: ${GENERATOR_TEMPLATES_REPOSITORY:}
+  templates-cache-dir: ${GENERATOR_TEMPLATES_CACHE_DIR:${user.home}/.project-generator/templates}
+  template: spring-boot
+  # 템플릿 버전 (project-templates/README.md "버전 정책"). 생성 결과 문서에 기록된다
+  template-version: ${GENERATOR_TEMPLATE_VERSION:v1.0.0}
+  output-dir: ${GENERATOR_OUTPUT_DIR:${user.home}/generated-projects}
+  max-retries: 2
+  slack:
+    # 두 토큰이 모두 있어야 Slack 연동이 켜진다. 없으면 웹 화면만 동작한다
+    bot-token: ${SLACK_BOT_TOKEN:}
+    app-token: ${SLACK_APP_TOKEN:}
+    command: /generate
+    # 쉼표로 구분한 Slack 사용자 ID (예: U012AB3CD,U045EF6GH). 비우면 워크스페이스의 누구나 쓸 수 있다
+    allowed-user-ids: ${SLACK_ALLOWED_USER_IDS:}
+    web-url: ${GENERATOR_WEB_URL:http://localhost:${server.port}}
 

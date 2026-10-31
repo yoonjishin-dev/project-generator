@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:project-templates:api",
+  "title": "API",
+  "description": "ApiAgent 출력. 엔티티별 REST 리소스와 지원 작업.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resources"],
+  "properties": {
+    "resources": {
+      "type": "array", "minItems": 1, "maxItems": 15,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entity", "path", "operations"],
+        "properties": {
+          "entity": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]{0,39}$" },
+          "path": { "type": "string", "pattern": "^/api/[a-z0-9]+(-[a-z0-9]+)*$" },
+          "operations": {
+            "type": "array", "minItems": 1, "uniqueItems": true,
+            "items": { "type": "string", "enum": ["LIST", "GET", "CREATE", "UPDATE", "DELETE"] }
+          }
+        }
+      }
+    }
+  }
+}

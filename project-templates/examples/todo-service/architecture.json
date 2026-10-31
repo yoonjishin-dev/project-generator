@@ -1,0 +1,29 @@
+{
+  "entities": [
+    {
+      "name": "Category",
+      "label": "카테고리",
+      "description": "할 일을 분류하는 기준입니다. (예: 업무, 개인)",
+      "featureIds": ["F-005", "F-006"],
+      "fields": [
+        { "name": "name", "label": "이름", "type": "STRING", "required": true, "unique": true }
+      ],
+      "relations": []
+    },
+    {
+      "name": "Todo",
+      "label": "할 일",
+      "description": "사용자가 해야 할 일 하나입니다.",
+      "featureIds": ["F-001", "F-002", "F-003", "F-004", "F-006"],
+      "fields": [
+        { "name": "title", "label": "제목", "type": "STRING", "required": true, "unique": false },
+        { "name": "memo", "label": "메모", "type": "TEXT", "required": false, "unique": false },
+        { "name": "dueDate", "label": "마감일", "type": "DATE", "required": false, "unique": false },
+        { "name": "completed", "label": "완료 여부", "type": "BOOLEAN", "required": true, "unique": false }
+      ],
+      "relations": [
+        { "type": "MANY_TO_ONE", "fieldName": "category", "target": "Category", "required": false }
+      ]
+    }
+  ]
+}

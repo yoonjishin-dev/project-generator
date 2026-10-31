@@ -1,0 +1,30 @@
+package {{basePackage}}.{{packageName}};
+
+{{#importsBigDecimal}}
+import java.math.BigDecimal;
+{{/importsBigDecimal}}
+{{#importsLocalDate}}
+import java.time.LocalDate;
+{{/importsLocalDate}}
+import java.time.LocalDateTime;
+
+public record {{name}}Response(
+        Long id,
+{{#params}}
+        {{dtoType}} {{dtoName}},
+{{/params}}
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
+
+    public static {{name}}Response from({{name}} entity) {
+        return new {{name}}Response(
+                entity.getId(),
+{{#params}}
+                {{responseExpression}},
+{{/params}}
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
+        );
+    }
+}

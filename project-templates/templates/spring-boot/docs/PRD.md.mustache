@@ -1,0 +1,59 @@
+{{#prd}}
+# {{title}} 기획서 (PRD)
+
+> project-generator 템플릿 `spring-boot` {{templateVersion}}로 생성된 문서입니다.
+
+## 개요
+
+{{summary}}
+
+## 목표
+
+{{#goals}}
+- {{.}}
+{{/goals}}
+
+## 대상 사용자
+
+| 사용자 | 설명 |
+|---|---|
+{{#targetUsers}}
+| {{name}} | {{description}} |
+{{/targetUsers}}
+
+## 기능 요구사항
+
+| ID | 기능 | 우선순위 | 설명 |
+|---|---|---|---|
+{{#features}}
+| {{id}} | {{name}} | {{priority}} | {{description}} |
+{{/features}}
+
+## 완료 조건
+
+{{#features}}
+### {{id}} {{name}}
+
+{{#acceptanceCriteria}}
+- [ ] {{.}}
+{{/acceptanceCriteria}}
+
+{{/features}}
+## 비기능 요구사항
+
+{{#nonFunctionalRequirements}}
+- {{.}}
+{{/nonFunctionalRequirements}}
+{{^nonFunctionalRequirements}}
+- 없음
+{{/nonFunctionalRequirements}}
+
+## 범위 외
+
+{{#outOfScope}}
+- {{.}}
+{{/outOfScope}}
+{{^outOfScope}}
+- 없음
+{{/outOfScope}}
+{{/prd}}

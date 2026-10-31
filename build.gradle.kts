@@ -40,6 +40,16 @@ dependencies {
     // JSON
     implementation("com.google.code.gson:gson")
 
+    // Mustache 템플릿 렌더링
+    implementation("com.samskivert:jmustache")
+
+    // 에이전트 출력 JSON Schema 검증 (3.x는 Jackson 3 기반이라 Spring Boot 3.5와 맞지 않음)
+    implementation("com.networknt:json-schema-validator:1.5.9")
+
+    // Slack 입력 (Socket Mode: 공개 주소 없이 앱이 Slack에 먼저 접속한다)
+    implementation("com.slack.api:bolt-socket-mode:1.53.0")
+    implementation("org.java-websocket:Java-WebSocket:1.6.0")
+
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
@@ -51,4 +61,6 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    // 템플릿이나 정답 결과(expected/)가 바뀌면 렌더러 테스트를 다시 돌린다
+    inputs.dir("project-templates").withPathSensitivity(PathSensitivity.RELATIVE)
 }

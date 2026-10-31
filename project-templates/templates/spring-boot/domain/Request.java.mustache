@@ -1,0 +1,19 @@
+package {{basePackage}}.{{packageName}};
+
+import jakarta.validation.constraints.*;
+{{#importsBigDecimal}}
+import java.math.BigDecimal;
+{{/importsBigDecimal}}
+{{#importsLocalDate}}
+import java.time.LocalDate;
+{{/importsLocalDate}}
+{{#importsLocalDateTime}}
+import java.time.LocalDateTime;
+{{/importsLocalDateTime}}
+
+public record {{name}}Request(
+{{#params}}
+        {{validationAnnotation}}{{dtoType}} {{dtoName}}{{^last}},{{/last}}
+{{/params}}
+) {
+}

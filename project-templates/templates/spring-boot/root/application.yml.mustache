@@ -1,0 +1,21 @@
+{{=<% %>=}}
+spring:
+  application:
+    name: <%projectName%>
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:<%databaseName%>}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8080

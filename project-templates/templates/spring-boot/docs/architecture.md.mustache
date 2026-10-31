@@ -1,0 +1,91 @@
+# {{#prd}}{{title}}{{/prd}} 아키텍처
+
+> project-generator 템플릿 `spring-boot` {{templateVersion}}로 생성된 문서입니다.
+
+## 기술 스택
+
+| 구분 | 기술 |
+|---|---|
+| 언어 | Java 21 |
+| 프레임워크 | Spring Boot 3.5.6 (Web, Data JPA, Validation) |
+| 데이터베이스 | MySQL |
+| 빌드 | Gradle (Kotlin DSL) |
+
+## 레이어 구조
+
+```mermaid
+flowchart LR
+    Client -->|HTTP JSON| Controller
+    Controller -->|Request / Response record| Service
+    Service -->|Entity| Repository
+    Repository -->|JPA| DB[(MySQL)]
+```
+
+## 패키지 구조
+
+```
+{{basePackage}}
+├── Application.java
+├── common
+│   ├── GlobalExceptionHandler.java
+│   └── NotFoundException.java
+{{#entities}}
+{{#last}}└{{/last}}{{^last}}├{{/last}}── {{packageName}}
+{{#last}} {{/last}}{{^last}}│{{/last}}   ├── {{name}}.java
+{{#last}} {{/last}}{{^last}}│{{/last}}   ├── {{name}}Controller.java
+{{#last}} {{/last}}{{^last}}│{{/last}}   ├── {{name}}Repository.java
+{{#hasBody}}
+{{#last}} {{/last}}{{^last}}│{{/last}}   ├── {{name}}Request.java
+{{/hasBody}}
+{{#last}} {{/last}}{{^last}}│{{/last}}   ├── {{name}}Response.java
+{{#last}} {{/last}}{{^last}}│{{/last}}   └── {{name}}Service.java
+{{/entities}}
+```
+
+## ER 다이어그램
+
+```mermaid
+erDiagram
+{{#entities}}
+    {{name}} {
+        bigint id PK
+{{#fields}}
+        {{erType}} {{columnName}}{{#unique}} UK{{/unique}} "{{label}}"
+{{/fields}}
+{{#relations}}
+        bigint {{joinColumnName}} FK "{{targetLabel}}"
+{{/relations}}
+        datetime created_at
+        datetime updated_at
+    }
+{{/entities}}
+{{#entities}}
+{{#relations}}
+    {{target}} {{#required}}||{{/required}}{{^required}}|o{{/required}}--o{ {{ownerName}} : "{{fieldName}}"
+{{/relations}}
+{{/entities}}
+```
+
+## 엔티티
+
+{{#entities}}
+### {{name}} ({{label}})
+
+{{description}}
+
+- 테이블: `{{tableName}}`
+- 관련 기능: {{featureIdsText}}
+
+| 필드 | 컬럼 | 타입 | 필수 | 고유 | 설명 |
+|---|---|---|---|---|---|
+| `id` | `id` | LONG | O | O | 식별자 |
+{{#fields}}
+| `{{name}}` | `{{columnName}}` | {{type}} | {{#required}}O{{/required}}{{^required}}-{{/required}} | {{#unique}}O{{/unique}}{{^unique}}-{{/unique}} | {{label}} |
+{{/fields}}
+{{#relations}}
+| `{{fieldName}}` | `{{joinColumnName}}` | → {{target}} | {{#required}}O{{/required}}{{^required}}-{{/required}} | - | {{targetLabel}} |
+{{/relations}}
+| `createdAt` | `created_at` | DATETIME | O | - | 생성 시각 |
+| `updatedAt` | `updated_at` | DATETIME | O | - | 수정 시각 |
+
+{{/entities}}

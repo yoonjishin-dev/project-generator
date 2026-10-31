@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:project-templates:prd",
+  "title": "PRD",
+  "description": "PlannerAgent 출력. 요구사항을 구조화한 기획서.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "summary", "goals", "targetUsers", "features", "nonFunctionalRequirements", "outOfScope"],
+  "properties": {
+    "title": { "type": "string", "minLength": 1, "maxLength": 100, "description": "서비스 이름 (한국어)" },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 500, "description": "서비스 한두 문장 요약" },
+    "goals": {
+      "type": "array", "minItems": 1, "maxItems": 5,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "targetUsers": {
+      "type": "array", "minItems": 1, "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "features": {
+      "type": "array", "minItems": 1, "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "description", "priority", "acceptanceCriteria"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^F-[0-9]{3}$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 50 },
+          "description": { "type": "string", "minLength": 1 },
+          "priority": { "type": "string", "enum": ["MUST", "SHOULD", "COULD"] },
+          "acceptanceCriteria": {
+            "type": "array", "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "nonFunctionalRequirements": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "outOfScope": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

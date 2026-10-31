@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Generator</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --border: #e2e5ea;
+      --text: #1b1f24;
+      --muted: #5f6b7a;
+      --accent: #2f5bea;
+      --accent-text: #ffffff;
+      --success: #1a7f4b;
+      --success-bg: #e7f6ee;
+      --danger: #c42b2b;
+      --danger-bg: #fdecec;
+      --code-bg: #f0f2f5;
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111418;
+        --surface: #1a1e24;
+        --border: #2c323b;
+        --text: #e6e9ee;
+        --muted: #9aa5b4;
+        --accent: #6f8fff;
+        --accent-text: #0b0d10;
+        --success: #4cc68a;
+        --success-bg: #14281e;
+        --danger: #ff7a7a;
+        --danger-bg: #2d1717;
+        --code-bg: #232831;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    h2 { font-size: 17px; margin: 0 0 12px; }
+    .lead { color: var(--muted); margin: 0 0 28px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .hint { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+    input, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+    }
+    textarea { min-height: 160px; resize: vertical; }
+    input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    .field { margin-bottom: 18px; }
+    .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 9px 16px;
+      border-radius: 8px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .form-error { color: var(--danger); margin: 12px 0 0; }
+    .status-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .elapsed { color: var(--muted); font-variant-numeric: tabular-nums; }
+    ol.steps { list-style: none; padding: 0; margin: 8px 0 0; }
+    ol.steps li { display: flex; align-items: center; gap: 10px; padding: 6px 0; color: var(--muted); }
+    ol.steps li.DONE { color: var(--text); }
+    ol.steps li.CURRENT { color: var(--text); font-weight: 600; }
+    ol.steps li.FAILED { color: var(--danger); font-weight: 600; }
+    .dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--border);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; flex: none;
+    }
+    li.DONE .dot { background: var(--success); border-color: var(--success); color: var(--surface); }
+    li.FAILED .dot { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+    li.CURRENT .dot { border-color: var(--accent); border-top-color: transparent; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { li.CURRENT .dot { animation: none; border-top-color: var(--accent); } }
+    .banner { border-radius: 8px; padding: 12px 14px; margin-top: 16px; }
+    .banner.success { background: var(--success-bg); }
+    .banner.danger { background: var(--danger-bg); }
+    .banner strong { display: block; margin-bottom: 4px; }
+    .banner ul { margin: 6px 0 0; padding-left: 18px; }
+    .path { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+    code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      word-break: break-all;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    .table-wrap { overflow-x: auto; }
+    .badge { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); white-space: nowrap; }
+    .badge.SUCCEEDED { color: var(--success); border-color: var(--success); }
+    .badge.FAILED { color: var(--danger); border-color: var(--danger); }
+    .badge.RUNNING, .badge.QUEUED { color: var(--accent); border-color: var(--accent); }
+    ul.recent { list-style: none; padding: 0; margin: 0; }
+    ul.recent li { border-bottom: 1px solid var(--border); }
+    ul.recent li:last-child { border-bottom: none; }
+    ul.recent button {
+      width: 100%; border: none; background: none; padding: 10px 4px; text-align: left;
+      display: flex; justify-content: space-between; gap: 12px; border-radius: 0;
+    }
+    ul.recent button:hover { background: var(--bg); }
+    .muted { color: var(--muted); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Project Generator</h1>
+  <p class="lead">요구사항과 프로젝트명을 입력하면 기획서, 아키텍처, API 명세와 Spring Boot 프로젝트를 로컬에 생성합니다.</p>
+
+  <form class="card" id="form" novalidate>
+    <div class="field">
+      <label for="projectName">프로젝트명</label>
+      <input id="projectName" name="projectName" autocomplete="off" placeholder="todo-service"
+             pattern="[a-z][a-z0-9]*(-[a-z0-9]+)*" required>
+      <p class="hint">영문 소문자, 숫자, 하이픈(-)만 쓸 수 있습니다. 예: <code>todo-service</code></p>
+    </div>
+    <div class="field">
+      <label for="requirements">요구사항</label>
+      <textarea id="requirements" name="requirements" maxlength="10000" required
+                placeholder="만들고 싶은 서비스와 기능을 자유롭게 적어 주세요."></textarea>
+      <p class="hint"><span id="count">0</span> / 10,000자</p>
+    </div>
+    <div class="actions">
+      <button type="submit" class="primary" id="submit">생성</button>
+      <button type="button" id="example">예시 넣기</button>
+    </div>
+    <p class="form-error" id="formError" role="alert" hidden></p>
+  </form>
+
+  <section class="card" id="job" hidden aria-live="polite">
+    <div class="status-head">
+      <h2 id="jobTitle"></h2>
+      <span class="elapsed" id="elapsed"></span>
+    </div>
+    <ol class="steps" id="steps"></ol>
+    <div id="outcome"></div>
+  </section>
+
+  <section class="card" id="recentCard" hidden>
+    <h2>최근 생성</h2>
+    <ul class="recent" id="recent"></ul>
+  </section>
+</main>
+
+<script>
+  const EXAMPLE = {
+    projectName: "todo-service",
+    requirements: "개인용 할 일 관리 서비스를 만들고 싶어요. 할 일을 등록, 수정, 삭제하고 목록으로 볼 수 있어야 합니다. "
+      + "할 일에는 제목, 메모, 마감일이 있고 완료 체크를 할 수 있어야 해요. 할 일을 카테고리(업무, 개인 등)로 분류할 수 있으면 좋겠고, "
+      + "카테고리도 직접 추가하고 지울 수 있어야 합니다. 나중에는 마감일 알림 기능도 있으면 좋겠어요."
+  };
+  const STATUS_LABEL = { QUEUED: "대기 중", RUNNING: "생성 중", SUCCEEDED: "완료", FAILED: "실패" };
+  const POLL_MS = 1500;
+
+  const $ = (id) => document.getElementById(id);
+  const form = $("form");
+  let currentId = null;
+  let lastJob = null;
+  let pollTimer = null;
+  let clockTimer = null;
+
+  function el(tag, attrs = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(attrs)) {
+      if (key === "class") node.className = value;
+      else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+      else node.setAttribute(key, value);
+    }
+    for (const child of children.flat()) {
+      if (child != null) node.append(child instanceof Node ? child : String(child));
+    }
+    return node;
+  }
+
+  function formatElapsed(job) {
+    if (!job.startedAt) return STATUS_LABEL[job.status];
+    const end = job.finishedAt ? new Date(job.finishedAt) : new Date();
+    const seconds = Math.max(0, Math.round((end - new Date(job.startedAt)) / 1000));
+    const time = seconds >= 60 ? `${Math.floor(seconds / 60)}분 ${seconds % 60}초` : `${seconds}초`;
+    return `${STATUS_LABEL[job.status]} · ${time}`;
+  }
+
+  function renderJob(job) {
+    lastJob = job;
+    $("job").hidden = false;
+    $("jobTitle").textContent = job.projectName;
+    $("elapsed").textContent = formatElapsed(job);
+
+    const icon = { DONE: "✓", FAILED: "!", CURRENT: "", PENDING: "" };
+    $("steps").replaceChildren(...job.steps.map((step) =>
+      el("li", { class: step.state }, el("span", { class: "dot", "aria-hidden": "true" }, icon[step.state]), step.label)));
+
+    const outcome = $("outcome");
+    if (job.status === "SUCCEEDED") {
+      const r = job.result;
+      const copy = el("button", { type: "button", onclick: async (event) => {
+        await navigator.clipboard.writeText(r.projectDir);
+        event.target.textContent = "복사됨";
+        setTimeout(() => (event.target.textContent = "경로 복사"), 1500);
+      } }, "경로 복사");
+      outcome.replaceChildren(
+        el("div", { class: "banner success" },
+          el("strong", {}, `${r.title} — 파일 ${r.fileCount}개를 생성했습니다`),
+          el("span", { class: "muted" }, r.summary),
+          el("div", { class: "path" }, el("code", {}, r.projectDir), copy)),
+        el("div", { class: "table-wrap" },
+          el("table", {},
+            el("thead", {}, el("tr", {}, el("th", {}, "엔티티"), el("th", {}, "API 경로"), el("th", {}, "지원 작업"))),
+            el("tbody", {}, r.entities.map((e) => el("tr", {},
+              el("td", {}, `${e.label} `, el("span", { class: "muted" }, `(${e.name})`)),
+              el("td", {}, el("code", {}, e.path)),
+              el("td", {}, e.operations.join(", "))))))),
+        el("p", { class: "hint" }, "생성된 폴더의 docs/ 에서 기획서, 아키텍처, API 명세를 볼 수 있습니다."));
+    } else if (job.status === "FAILED") {
+      outcome.replaceChildren(el("div", { class: "banner danger" },
+        el("strong", {}, "생성하지 못했습니다"),
+        job.error.message,
+        job.error.details.length ? el("ul", {}, job.error.details.map((d) => el("li", {}, d))) : null));
+    } else {
+      outcome.replaceChildren(el("p", { class: "hint" },
+        job.status === "QUEUED" ? "앞의 생성 작업이 끝나면 시작합니다." : "로컬 AI로 생성하는 중입니다. 보통 1~3분 걸립니다."));
+    }
+  }
+
+  function renderRecent(jobs) {
+    $("recentCard").hidden = jobs.length === 0;
+    $("recent").replaceChildren(...jobs.map((job) => el("li", {},
+      el("button", { type: "button", onclick: () => watch(job.id) },
+        el("span", {}, job.projectName, " ", el("span", { class: "muted" }, new Date(job.createdAt).toLocaleString("ko-KR"))),
+        el("span", { class: `badge ${job.status}` }, STATUS_LABEL[job.status])))));
+  }
+
+  async function api(path, options) {
+    const response = await fetch(path, options);
+    const body = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(body?.detail || `요청에 실패했습니다 (${response.status})`);
+    return body;
+  }
+
+  async function refreshRecent() {
+    try {
+      renderRecent(await api("/api/generations"));
+    } catch (e) {
+      // 목록은 부가 정보라 실패해도 화면을 막지 않는다
+    }
+  }
+
+  async function poll() {
+    clearTimeout(pollTimer);
+    const id = currentId;
+    try {
+      const job = await api(`/api/generations/${id}`);
+      if (id !== currentId) return;
+      renderJob(job);
+      const active = job.status === "QUEUED" || job.status === "RUNNING";
+      $("submit").disabled = active;
+      if (active) {
+        pollTimer = setTimeout(poll, POLL_MS);
+      } else {
+        clearInterval(clockTimer);
+        refreshRecent();
+      }
+    } catch (e) {
+      $("formError").textContent = e.message;
+      $("formError").hidden = false;
+    }
+  }
+
+  function watch(id) {
+    currentId = id;
+    lastJob = null;
+    clearInterval(clockTimer);
+    // 상태는 1.5초마다 받아오지만 경과 시간은 1초마다 다시 그린다
+    clockTimer = setInterval(() => {
+      if (lastJob && lastJob.id === currentId) $("elapsed").textContent = formatElapsed(lastJob);
+    }, 1000);
+    poll();
+    $("job").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    $("formError").hidden = true;
+    const projectName = $("projectName").value.trim();
+    const requirements = $("requirements").value.trim();
+    if (!$("projectName").checkValidity() || !projectName) {
+      $("formError").textContent = "프로젝트명은 영문 소문자로 시작하고, 소문자·숫자·하이픈만 쓸 수 있습니다.";
+      $("formError").hidden = false;
+      $("projectName").focus();
+      return;
+    }
+    if (!requirements) {
+      $("formError").textContent = "요구사항을 입력하세요.";
+      $("formError").hidden = false;
+      $("requirements").focus();
+      return;
+    }
+    $("submit").disabled = true;
+    try {
+      const job = await api("/api/generations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectName, requirements })
+      });
+      watch(job.id);
+      refreshRecent();
+    } catch (e) {
+      $("formError").textContent = e.message;
+      $("formError").hidden = false;
+      $("submit").disabled = false;
+    }
+  });
+
+  $("example").addEventListener("click", () => {
+    $("projectName").value = EXAMPLE.projectName;
+    $("requirements").value = EXAMPLE.requirements;
+    $("count").textContent = EXAMPLE.requirements.length.toLocaleString("ko-KR");
+  });
+  $("requirements").addEventListener("input", (event) => {
+    $("count").textContent = event.target.value.length.toLocaleString("ko-KR");
+  });
+
+  refreshRecent();
+  // Slack 메시지의 "웹에서 보기" 링크(/?job=...)로 들어오면 그 작업을 바로 보여준다
+  const linkedJob = new URLSearchParams(location.search).get("job");
+  if (linkedJob) watch(linkedJob);
+</script>
+</body>
+</html>

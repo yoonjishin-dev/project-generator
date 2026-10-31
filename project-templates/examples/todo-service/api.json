@@ -1,0 +1,6 @@
+{
+  "resources": [
+    { "entity": "Category", "path": "/api/categories", "operations": ["LIST", "CREATE", "DELETE"] },
+    { "entity": "Todo", "path": "/api/todos", "operations": ["LIST", "GET", "CREATE", "UPDATE", "DELETE"] }
+  ]
+}

@@ -1,0 +1,95 @@
+package {{basePackage}}.{{packageName}};
+
+{{#usesNotFound}}
+import {{basePackage}}.common.NotFoundException;
+{{/usesNotFound}}
+{{#hasBody}}
+{{#relations}}
+import {{basePackage}}.{{targetPackageName}}.{{target}};
+import {{basePackage}}.{{targetPackageName}}.{{target}}Repository;
+{{/relations}}
+{{/hasBody}}
+{{#hasList}}
+import java.util.List;
+{{/hasList}}
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class {{name}}Service {
+
+    private final {{name}}Repository {{varName}}Repository;
+{{#hasBody}}
+{{#relations}}
+    private final {{target}}Repository {{targetVarName}}Repository;
+{{/relations}}
+{{/hasBody}}
+{{#hasList}}
+
+    public List<{{name}}Response> findAll() {
+        return {{varName}}Repository.findAll().stream()
+                .map({{name}}Response::from)
+                .toList();
+    }
+{{/hasList}}
+{{#hasGet}}
+
+    public {{name}}Response findById(Long id) {
+        return {{name}}Response.from(get{{name}}(id));
+    }
+{{/hasGet}}
+{{#hasCreate}}
+
+    @Transactional
+    public {{name}}Response create({{name}}Request request) {
+{{#relations}}
+        {{target}} {{fieldName}} = find{{capitalizedFieldName}}(request.{{fieldName}}Id());
+{{/relations}}
+        {{name}} {{varName}} = new {{name}}({{#params}}{{#isRelation}}{{name}}{{/isRelation}}{{^isRelation}}request.{{dtoName}}(){{/isRelation}}{{^last}}, {{/last}}{{/params}});
+        return {{name}}Response.from({{varName}}Repository.save({{varName}}));
+    }
+{{/hasCreate}}
+{{#hasUpdate}}
+
+    @Transactional
+    public {{name}}Response update(Long id, {{name}}Request request) {
+        {{name}} {{varName}} = get{{name}}(id);
+{{#relations}}
+        {{target}} {{fieldName}} = find{{capitalizedFieldName}}(request.{{fieldName}}Id());
+{{/relations}}
+        {{varName}}.update({{#params}}{{#isRelation}}{{name}}{{/isRelation}}{{^isRelation}}request.{{dtoName}}(){{/isRelation}}{{^last}}, {{/last}}{{/params}});
+        return {{name}}Response.from({{varName}}Repository.saveAndFlush({{varName}}));
+    }
+{{/hasUpdate}}
+{{#hasDelete}}
+
+    @Transactional
+    public void delete(Long id) {
+        {{varName}}Repository.delete(get{{name}}(id));
+    }
+{{/hasDelete}}
+{{#hasId}}
+
+    private {{name}} get{{name}}(Long id) {
+        return {{varName}}Repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("{{label}}", id));
+    }
+{{/hasId}}
+{{#hasBody}}
+{{#relations}}
+
+    private {{target}} find{{capitalizedFieldName}}(Long id) {
+{{^required}}
+        if (id == null) {
+            return null;
+        }
+{{/required}}
+        return {{targetVarName}}Repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("{{targetLabel}}", id));
+    }
+{{/relations}}
+{{/hasBody}}
+}
